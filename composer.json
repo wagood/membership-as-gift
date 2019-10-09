@@ -8,7 +8,7 @@
         "cms",
         "craftcms",
         "craft-plugin",
-        "membership-as-gift"
+        "membership as gift"
     ],
     "support": {
         "docs": "https://github.com/wagood/membership-as-gift/blob/master/README.md",
@@ -22,7 +22,7 @@
         }
     ],
     "require": {
-        "craftcms/cms": "^3.0.0-RC1"
+        "craftcms/cms": "^3.0.0"
     },
     "autoload": {
         "psr-4": {
@@ -30,14 +30,11 @@
         }
     },
     "extra": {
-        "name": "membership-as-gift",
+        "name": "Membership As Gift",
         "handle": "membership-as-gift",
         "hasCpSettings": false,
         "hasCpSection": false,
         "changelogUrl": "https://raw.githubusercontent.com/wagood/membership-as-gift/master/CHANGELOG.md",
-        "components": {
-            "giftService": "wagood\\membershipasgift\\services\\GiftService"
-        },
-        "class": "wagood\\membershipasgift\\Membershipasgift"
+        "class": "wagood\\membershipasgift\\MembershipAsGift"
     }
 }
