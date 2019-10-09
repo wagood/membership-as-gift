@@ -1,0 +1,26 @@
+{# @var craft \craft\web\twig\variables\CraftVariable #}
+{#
+/**
+ * membership-as-gift plugin for Craft CMS
+ *
+ * GiftField Field Settings
+ *
+ * @author    WAGOOD
+ * @copyright Copyright (c) 2019 WAGOOD
+ * @link      https://prestaclub.ru
+ * @package   Membershipasgift
+ * @since     0.0.1
+ */
+#}
+
+{% import "_includes/forms" as forms %}
+
+{% do view.registerAssetBundle("wagood\\membershipasgift\\assetbundles\\membershipasgift\\MembershipasgiftAsset") %}
+
+{{ forms.textField({
+    label: 'Some Attribute',
+    instructions: 'Enter some attribute here.',
+    id: 'someAttribute',
+    name: 'someAttribute',
+    value: field['someAttribute']})
+}}

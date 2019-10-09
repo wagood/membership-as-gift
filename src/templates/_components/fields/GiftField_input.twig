@@ -1,0 +1,24 @@
+{# @var craft \craft\web\twig\variables\CraftVariable #}
+{#
+/**
+ * membership-as-gift plugin for Craft CMS 3.x
+ *
+ * GiftField Field Input
+ *
+ * @author    WAGOOD
+ * @copyright Copyright (c) 2019 WAGOOD
+ * @link      https://prestaclub.ru
+ * @package   Membershipasgift
+ * @since     0.0.1
+ */
+#}
+
+{% import "_includes/forms" as forms %}
+
+{{ forms.textField({
+        label: 'Some Field',
+        instructions: 'Enter some text here.',
+        id: name,
+        name: name,
+        value: value})
+}}

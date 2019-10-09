@@ -1,0 +1,43 @@
+{
+    "name": "wagood/membership-as-gift",
+    "description": "Purchase membership as gift",
+    "type": "craft-plugin",
+    "version": "0.0.1",
+    "keywords": [
+        "craft",
+        "cms",
+        "craftcms",
+        "craft-plugin",
+        "membership-as-gift"
+    ],
+    "support": {
+        "docs": "https://github.com/wagood/membership-as-gift/blob/master/README.md",
+        "issues": "https://github.com/wagood/membership-as-gift/issues"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "WAGOOD",
+            "homepage": "https://prestaclub.ru"
+        }
+    ],
+    "require": {
+        "craftcms/cms": "^3.0.0-RC1"
+    },
+    "autoload": {
+        "psr-4": {
+          "wagood\\membershipasgift\\": "src/"
+        }
+    },
+    "extra": {
+        "name": "membership-as-gift",
+        "handle": "membership-as-gift",
+        "hasCpSettings": false,
+        "hasCpSection": false,
+        "changelogUrl": "https://raw.githubusercontent.com/wagood/membership-as-gift/master/CHANGELOG.md",
+        "components": {
+            "giftService": "wagood\\membershipasgift\\services\\GiftService"
+        },
+        "class": "wagood\\membershipasgift\\Membershipasgift"
+    }
+}
