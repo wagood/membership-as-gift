@@ -2,7 +2,7 @@
     "name": "wagood/membership-as-gift",
     "description": "Purchase membership as gift",
     "type": "craft-plugin",
-    "version": "0.0.1",
+    "version": "1.0.0.1",
     "keywords": [
         "craft",
         "cms",
