@@ -32,155 +32,136 @@ use craft\db\Migration;
  */
 class Install extends Migration
 {
-    // Public Properties
-    // =========================================================================
+  // Public Properties
+  // =========================================================================
 
-    /**
-     * @var string The database driver to use
-     */
-    public $driver;
+  /**
+   * @var string The database driver to use
+   */
+  public $driver;
 
-    // Public Methods
-    // =========================================================================
+  // Public Methods
+  // =========================================================================
 
-    /**
-     * This method contains the logic to be executed when applying this migration.
-     * This method differs from [[up()]] in that the DB logic implemented here will
-     * be enclosed within a DB transaction.
-     * Child classes may implement this method instead of [[up()]] if the DB logic
-     * needs to be within a transaction.
-     *
-     * @return boolean return a false value to indicate the migration fails
-     * and should not proceed further. All other return values mean the migration succeeds.
-     */
-    public function safeUp()
-    {
-        $this->driver = Craft::$app->getConfig()->getDb()->driver;
-        if ($this->createTables()) {
-            $this->createIndexes();
-            $this->addForeignKeys();
-            // Refresh the db schema caches
-            Craft::$app->db->schema->refresh();
-            $this->insertDefaultData();
-        }
-
-        return true;
+  /**
+   * This method contains the logic to be executed when applying this migration.
+   * This method differs from [[up()]] in that the DB logic implemented here will
+   * be enclosed within a DB transaction.
+   * Child classes may implement this method instead of [[up()]] if the DB logic
+   * needs to be within a transaction.
+   *
+   * @return boolean return a false value to indicate the migration fails
+   * and should not proceed further. All other return values mean the migration succeeds.
+   */
+  public function safeUp()
+  {
+    $this->driver = Craft::$app->getConfig()->getDb()->driver;
+    if ($this->createTables()) {
+      $this->createIndexes();
+      // Refresh the db schema caches
+      Craft::$app->db->schema->refresh();
+      $this->insertDefaultData();
     }
 
-    /**
-     * This method contains the logic to be executed when removing this migration.
-     * This method differs from [[down()]] in that the DB logic implemented here will
-     * be enclosed within a DB transaction.
-     * Child classes may implement this method instead of [[down()]] if the DB logic
-     * needs to be within a transaction.
-     *
-     * @return boolean return a false value to indicate the migration fails
-     * and should not proceed further. All other return values mean the migration succeeds.
-     */
-    public function safeDown()
-    {
-        $this->driver = Craft::$app->getConfig()->getDb()->driver;
-        $this->removeTables();
+    return true;
+  }
 
-        return true;
-    }
+  /**
+   * This method contains the logic to be executed when removing this migration.
+   * This method differs from [[down()]] in that the DB logic implemented here will
+   * be enclosed within a DB transaction.
+   * Child classes may implement this method instead of [[down()]] if the DB logic
+   * needs to be within a transaction.
+   *
+   * @return boolean return a false value to indicate the migration fails
+   * and should not proceed further. All other return values mean the migration succeeds.
+   */
+  public function safeDown()
+  {
+    $this->driver = Craft::$app->getConfig()->getDb()->driver;
+    $this->removeTables();
 
-    // Protected Methods
-    // =========================================================================
+    return true;
+  }
 
-    /**
-     * Creates the tables needed for the Records used by the plugin
-     *
-     * @return bool
-     */
-    protected function createTables()
-    {
-        $tablesCreated = false;
+  // Protected Methods
+  // =========================================================================
+
+  /**
+   * Creates the tables needed for the Records used by the plugin
+   *
+   * @return bool
+   */
+  protected function createTables()
+  {
+    $tablesCreated = false;
 
     // membershipasgift_giftrecord table
-        $tableSchema = Craft::$app->db->schema->getTableSchema('{{%membershipasgift_giftrecord}}');
-        if ($tableSchema === null) {
-            $tablesCreated = true;
-            $this->createTable(
-                '{{%membershipasgift_giftrecord}}',
-                [
-                    'id' => $this->primaryKey(),
-                    'dateCreated' => $this->dateTime()->notNull(),
-                    'dateUpdated' => $this->dateTime()->notNull(),
-                    'uid' => $this->uid(),
-                // Custom columns in the table
-                    'siteId' => $this->integer()->notNull(),
-                    'some_field' => $this->string(255)->notNull()->defaultValue(''),
-                ]
-            );
-        }
-
-        return $tablesCreated;
+    $tableSchema = Craft::$app->db->schema->getTableSchema('{{%membershipasgift_giftrecord}}');
+    if ($tableSchema === null) {
+      $tablesCreated = true;
+      $this->createTable(
+          '{{%membershipasgift_giftrecord}}',
+          [
+              'id' => $this->primaryKey(),
+              'dateCreated' => $this->dateTime()->notNull(),
+              'dateUpdated' => $this->dateTime()->notNull(),
+              'uid' => $this->uid(),
+            // Custom columns in the table
+              'giftCode' => $this->string(32)->notNull()->defaultValue(''),
+              'activated' => $this->integer()->notNull()->defaultValue(0),
+              'membership' => $this->string(32)->notNull()->defaultValue(''),
+          ]
+      );
     }
 
-    /**
-     * Creates the indexes needed for the Records used by the plugin
-     *
-     * @return void
-     */
-    protected function createIndexes()
-    {
+    return $tablesCreated;
+  }
+
+  /**
+   * Creates the indexes needed for the Records used by the plugin
+   *
+   * @return void
+   */
+  protected function createIndexes()
+  {
     // membershipasgift_giftrecord table
-        $this->createIndex(
-            $this->db->getIndexName(
-                '{{%membershipasgift_giftrecord}}',
-                'some_field',
-                true
-            ),
+    $this->createIndex(
+        $this->db->getIndexName(
             '{{%membershipasgift_giftrecord}}',
-            'some_field',
+            'giftCode',
             true
-        );
-        // Additional commands depending on the db driver
-        switch ($this->driver) {
-            case DbConfig::DRIVER_MYSQL:
-                break;
-            case DbConfig::DRIVER_PGSQL:
-                break;
-        }
+        ),
+        '{{%membershipasgift_giftrecord}}',
+        'giftCode',
+        true
+    );
+    // Additional commands depending on the db driver
+    switch ($this->driver) {
+      case DbConfig::DRIVER_MYSQL:
+        break;
+      case DbConfig::DRIVER_PGSQL:
+        break;
     }
+  }
 
-    /**
-     * Creates the foreign keys needed for the Records used by the plugin
-     *
-     * @return void
-     */
-    protected function addForeignKeys()
-    {
+  /**
+   * Populates the DB with the default data.
+   *
+   * @return void
+   */
+  protected function insertDefaultData()
+  {
+  }
+
+  /**
+   * Removes the tables needed for the Records used by the plugin
+   *
+   * @return void
+   */
+  protected function removeTables()
+  {
     // membershipasgift_giftrecord table
-        $this->addForeignKey(
-            $this->db->getForeignKeyName('{{%membershipasgift_giftrecord}}', 'siteId'),
-            '{{%membershipasgift_giftrecord}}',
-            'siteId',
-            '{{%sites}}',
-            'id',
-            'CASCADE',
-            'CASCADE'
-        );
-    }
-
-    /**
-     * Populates the DB with the default data.
-     *
-     * @return void
-     */
-    protected function insertDefaultData()
-    {
-    }
-
-    /**
-     * Removes the tables needed for the Records used by the plugin
-     *
-     * @return void
-     */
-    protected function removeTables()
-    {
-    // membershipasgift_giftrecord table
-        $this->dropTableIfExists('{{%membershipasgift_giftrecord}}');
-    }
+    $this->dropTableIfExists('{{%membershipasgift_giftrecord}}');
+  }
 }

@@ -14,6 +14,7 @@ use wagood\membershipasgift\Membershipasgift;
 
 use Craft;
 use craft\base\Component;
+use wagood\membershipasgift\elements\Gift;
 
 /**
  * GiftService Service
@@ -30,23 +31,30 @@ use craft\base\Component;
  */
 class GiftService extends Component
 {
-    // Public Methods
-    // =========================================================================
+  // Public Methods
+  // =========================================================================
 
-    /**
-     * This function can literally be anything you want, and you can have as many service
-     * functions as you want
-     *
-     * From any other plugin file, call it like this:
-     *
-     *     Membershipasgift::$plugin->giftService->exampleService()
-     *
-     * @return mixed
-     */
-    public function exampleService()
-    {
-        $result = 'something';
+  public function isCodeKeyUnique(string $giftCode): bool
+  {
+    return !(bool)Gift::findOne(['giftCode' => $giftCode]);
+  }
 
-        return $result;
+  /**
+   * @return string
+   * @from https://www.php.net/manual/ru/function.uniqid.php
+   */
+  public function generateCodeKey(): string
+  {
+    $s = uniqid("", true);
+    $num = hexdec(str_replace(".", "", (string)$s));
+    $index = '1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    $base = strlen($index);
+    $giftCode = '';
+    for ($t = floor(log10($num) / log10($base)); $t >= 0; $t--) {
+      $a = floor($num / pow($base, $t));
+      $giftCode = $giftCode . substr($index, $a, 1);
+      $num = $num - ($a * pow($base, $t));
     }
+    return $giftCode;
+  }
 }

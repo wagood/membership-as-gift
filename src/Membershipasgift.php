@@ -10,9 +10,9 @@
 
 namespace wagood\membershipasgift;
 
-use wagood\membershipasgift\services\GiftService as GiftServiceService;
+use wagood\membershipasgift\services\GiftService;
 use wagood\membershipasgift\variables\MembershipasgiftVariable;
-use wagood\membershipasgift\fields\GiftField as GiftFieldField;
+use wagood\membershipasgift\fields\GiftField;
 
 use Craft;
 use craft\base\Plugin;
@@ -84,25 +84,26 @@ class MembershipAsGift extends Plugin
     parent::init();
     self::$plugin = $this;
 
-    $this->_registerCpRoutes();
+    $this->_registerSiteRoutes();
 
     // Register our site routes
-    Event::on(
+    /*Event::on(
         UrlManager::class,
         UrlManager::EVENT_REGISTER_SITE_URL_RULES,
         function (RegisterUrlRulesEvent $event) {
-          $event->rules['siteActionTrigger1'] = 'membership-as-gift/gift-controller';
+          $event->rules['siteActionTrigger1'] = 'members/activation/<giftId>';
+          $event->rules['siteActionTrigger2'] = 'members/activation/<giftId>';
         }
-    );
+    );*/
 
     // Register our CP routes
-    Event::on(
+    /*Event::on(
         UrlManager::class,
         UrlManager::EVENT_REGISTER_CP_URL_RULES,
         function (RegisterUrlRulesEvent $event) {
           $event->rules['cpActionTrigger1'] = 'membership-as-gift/gift-controller/do-something';
         }
-    );
+    );*/
 
     // Register our fields
     Event::on(
@@ -165,23 +166,25 @@ class MembershipAsGift extends Plugin
 
   // Protected Methods
   // =========================================================================
-  private function _registerCpRoutes()
+  private function _registerSiteRoutes()
   {
-    Event::on(UrlManager::class, UrlManager::EVENT_REGISTER_CP_URL_RULES, function(RegisterUrlRulesEvent $event) {
+    // Register our site routes
+    Event::on(UrlManager::class, UrlManager::EVENT_REGISTER_SITE_URL_RULES, function(RegisterUrlRulesEvent $event) {
       $event->rules = array_merge($event->rules, [
-          'members/activation/<voucherId>' => 'membership-as-gift/voucher/activate',
-          /**'gift-voucher/voucher-types/<voucherTypeId:\d+>' => 'gift-voucher/voucher-types/edit',
+          'members/activation/<giftId:\w+>' => 'membership-as-gift/gift/activate',
+          'members/voucher/create/<userId:\d+>' => 'membership-as-gift/gift/create',
+        /**'gift-voucher/voucher-types/<voucherTypeId:\d+>' => 'gift-voucher/voucher-types/edit',
 
-          'gift-voucher/vouchers/<voucherTypeHandle:{handle}>' => 'gift-voucher/vouchers/index',
-          'gift-voucher/vouchers/<voucherTypeHandle:{handle}>/new' => 'gift-voucher/vouchers/edit',
-          'gift-voucher/vouchers/<voucherTypeHandle:{handle}>/new/<siteHandle:\w+>' => 'gift-voucher/vouchers/edit',
-          'gift-voucher/vouchers/<voucherTypeHandle:{handle}>/<voucherId:\d+>' => 'gift-voucher/vouchers/edit',
-          'gift-voucher/vouchers/<voucherTypeHandle:{handle}>/<voucherId:\d+>/<siteHandle:\w+>' => 'gift-voucher/vouchers/edit',
+        'gift-voucher/vouchers/<voucherTypeHandle:{handle}>' => 'gift-voucher/vouchers/index',
+        'gift-voucher/vouchers/<voucherTypeHandle:{handle}>/new' => 'gift-voucher/vouchers/edit',
+        'gift-voucher/vouchers/<voucherTypeHandle:{handle}>/new/<siteHandle:\w+>' => 'gift-voucher/vouchers/edit',
+        'gift-voucher/vouchers/<voucherTypeHandle:{handle}>/<voucherId:\d+>' => 'gift-voucher/vouchers/edit',
+        'gift-voucher/vouchers/<voucherTypeHandle:{handle}>/<voucherId:\d+>/<siteHandle:\w+>' => 'gift-voucher/vouchers/edit',
 
-          'gift-voucher/codes/new' => 'gift-voucher/codes/edit',
-          'gift-voucher/codes/<codeId:\d+>' => 'gift-voucher/codes/edit',
+        'gift-voucher/codes/new' => 'gift-voucher/codes/edit',
+        'gift-voucher/codes/<codeId:\d+>' => 'gift-voucher/codes/edit',
 
-          'gift-voucher/settings' => 'gift-voucher/base/settings',**/
+        'gift-voucher/settings' => 'gift-voucher/base/settings',**/
       ]);
     });
   }
