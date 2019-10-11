@@ -10,8 +10,6 @@
 
 namespace wagood\membershipasgift\records;
 
-use wagood\membershipasgift\Membershipasgift;
-
 use craft\db\ActiveRecord;
 use craft\records\Element;
 
@@ -59,4 +57,7 @@ class GiftRecord extends ActiveRecord
   {
     return $this->hasOne(Element::class, ['id' => 'id']);
   }
+
+
+
 }

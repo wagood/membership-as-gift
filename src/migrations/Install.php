@@ -10,11 +10,10 @@
 
 namespace wagood\membershipasgift\migrations;
 
-use wagood\membershipasgift\Membershipasgift;
-
 use Craft;
 use craft\config\DbConfig;
 use craft\db\Migration;
+use craft\helpers\MigrationHelper;
 
 /**
  * membership-as-gift Install Migration
@@ -60,6 +59,7 @@ class Install extends Migration
       $this->createIndexes();
       // Refresh the db schema caches
       Craft::$app->db->schema->refresh();
+      $this->addForeignKeys();
       $this->insertDefaultData();
     }
 
@@ -79,6 +79,7 @@ class Install extends Migration
   public function safeDown()
   {
     $this->driver = Craft::$app->getConfig()->getDb()->driver;
+    $this->dropForeignKeys();
     $this->removeTables();
 
     return true;
@@ -109,8 +110,8 @@ class Install extends Migration
               'uid' => $this->uid(),
             // Custom columns in the table
               'giftCode' => $this->string(32)->notNull()->defaultValue(''),
-              'activated' => $this->integer()->notNull()->defaultValue(0),
-              'membership' => $this->string(32)->notNull()->defaultValue(''),
+              'subscriptionId' => $this->integer()->notNull()->defaultValue(0),
+              'subscriptionType' => $this->string(32)->notNull()->defaultValue(''),
           ]
       );
     }
@@ -118,6 +119,15 @@ class Install extends Migration
     return $tablesCreated;
   }
 
+    protected function addForeignKeys()
+    {
+        $this->addForeignKey($this->db->getForeignKeyName('{{%membershipasgift_giftrecord}}', 'id'), '{{%membershipasgift_giftrecord}}', 'id', '{{%elements}}', 'id', 'CASCADE', null);
+    }
+
+    protected function dropForeignKeys()
+    {
+        MigrationHelper::dropAllForeignKeysOnTable('{{%membershipasgift_giftrecord}}', $this);
+    }
   /**
    * Creates the indexes needed for the Records used by the plugin
    *

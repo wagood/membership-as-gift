@@ -7,11 +7,10 @@ use wagood\membershipasgift\records\GiftRecord;
 
 use Craft;
 use craft\base\Element;
-use craft\db\Query;
 use craft\elements\db\ElementQueryInterface;
 use yii\base\InvalidConfigException;
 
-class Gift extends Element
+class GiftElement extends Element
 {
   /**
    * @inheritdoc
@@ -30,12 +29,12 @@ class Gift extends Element
   }
 
   public $giftCode;
-  public $activated = 0;
-  public $membership = 'none';
+  public $subscriptionId;
+  public $subscriptionType = 'none';
 
   public function getName()
   {
-    return Craft::t('membership-as-gift', 'Gift code');
+    return Craft::t('subscription-as-gift', 'Gift code');
   }
 
   public function rules(): array
@@ -43,7 +42,8 @@ class Gift extends Element
     $rules = parent::rules();
 
     $rules[] = [['giftCode'], 'required'];
-    $rules[] = [['membership'], 'required'];
+    $rules[] = [['subscriptionId'], 'required'];
+    $rules[] = [['subscriptionType'], 'required'];
 
     return $rules;
   }
@@ -53,27 +53,33 @@ class Gift extends Element
     return new GiftQuery(static::class);
   }
 
+  public static function hasStatuses(): bool
+  {
+      return true;
+  }
+
   public function afterSave(bool $isNew)
   {
     if (!$isNew) {
-      $giftRecords = GiftRecord::findOne($this->id);
+      $giftRecord = GiftRecord::findOne($this->id);
 
-      if (!$giftRecords) {
+      if (!$giftRecord) {
         throw new InvalidConfigException('Invalid code id: ' . $this->id);
       }
     } else {
-      $giftRecords = new GiftRecord();
-      $giftRecords->id = $this->id;
-      $giftRecords->membership = $this->membership;
+      $giftRecord = new GiftRecord();
+      $giftRecord->id = $this->id;
     }
 
     if ($isNew) {
-      $giftRecords->giftCode = $this->generateCode();
+      $giftRecord->giftCode = $this->generateCode();
       // set the giftCode to the Code as well to use it directly
-      $this->giftCode = $giftRecords->giftCode;
+      $this->giftCode = $giftRecord->giftCode;
+      $giftRecord->subscriptionId = $this->subscriptionId;
+      $giftRecord->subscriptionType = $this->subscriptionType;
     }
 
-    $giftRecords->save(false);
+    $giftRecord->save(false);
   }
 
   protected function generateCode(): string
@@ -84,4 +90,5 @@ class Gift extends Element
 
     return $codeKey;
   }
+
 }

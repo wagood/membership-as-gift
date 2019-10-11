@@ -10,10 +10,13 @@
 
 namespace wagood\membershipasgift\controllers;
 
-use wagood\membershipasgift\Membershipasgift;
+use wagood\membershipasgift\elements\GiftElement;
 
 use Craft;
 use craft\web\Controller;
+
+use \Solspace\Freeform\Elements\Submission;
+use \yii\web\HttpException;
 
 /**
  * GiftController Controller
@@ -38,6 +41,8 @@ use craft\web\Controller;
 class GiftController extends Controller
 {
 
+    public $allowStatus = ['open'];
+
     // Protected Properties
     // =========================================================================
 
@@ -50,13 +55,6 @@ class GiftController extends Controller
 
     // Public Methods
     // =========================================================================
-
-    /**
-     * Handle a request going to our plugin's index action URL,
-     * e.g.: actions/membership-as-gift/gift-controller
-     *
-     * @return mixed
-     */
     public function actionActivate(string $giftId)
     {
         $result = 'Welcome to the GiftControllerController activate() method';
@@ -64,16 +62,53 @@ class GiftController extends Controller
         return $result;
     }
 
-    /**
-     * Handle a request going to our plugin's actionDoSomething URL,
-     * e.g.: actions/membership-as-gift/gift-controller/do-something
-     *
-     * @return mixed
-     */
-    public function actionCreate(int $userId)
-    {
-        $result = 'Welcome to the GiftControllerController create() method';
 
-        return $result;
+    public function actionCreate(int $Id)
+    {
+        // @TODO: check for isPost request
+        //$this->requirePostRequest();
+        //$request = Craft::$app->getRequest();
+        //$codeId = $request->getBodyParam('codeId');
+
+        // check for Freeform plugin
+        $Freeform = Craft::$app->getPlugins()->getPlugin('freeform');
+        if (null === $Freeform) {
+            throw new HttpException(503, 'Freeform plugin required');
+        }
+
+        // Get submission by token or Id
+        $submission = $Freeform->submissions->getSubmissionById($Id);
+        if (!$submission instanceof Submission) {
+            throw new HttpException( 404,'Submission not found');
+        }
+
+        // Check for submission type is Open
+        if (!(isset($submission->status) && in_array($submission->status, $this->allowStatus))) {
+            throw new HttpException(404,'Subscription is closed');
+        }
+
+        // check for subscriptionId is unique
+        if (GiftElement::find()->subscriptionId($Id)->one()) {
+            throw new HttpException(503, 'Gift always was created');
+        }
+
+
+        // Get subscriptionType
+        $subscriptionType = $submission->subscriptionType->getValue();
+
+        $giftElement = new GiftElement();
+        $giftElement->subscriptionId = $Id;
+        $giftElement->subscriptionType = $subscriptionType;
+
+        // Save it
+        if (!Craft::$app->getElements()->saveElement($giftElement, false)) {
+            throw new HttpException(503, 'Can\'t save gift');
+        }
+
+        var_dump($submission->status);
+        var_dump($subscriptionType);
+
+        // create new Gift
+        exit();
     }
 }

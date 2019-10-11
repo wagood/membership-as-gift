@@ -10,11 +10,9 @@
 
 namespace wagood\membershipasgift\services;
 
-use wagood\membershipasgift\Membershipasgift;
+use wagood\membershipasgift\elements\GiftElement;
 
-use Craft;
 use craft\base\Component;
-use wagood\membershipasgift\elements\Gift;
 
 /**
  * GiftService Service
@@ -36,7 +34,7 @@ class GiftService extends Component
 
   public function isCodeKeyUnique(string $giftCode): bool
   {
-    return !(bool)Gift::findOne(['giftCode' => $giftCode]);
+    return !(bool)GiftElement::findOne(['giftCode' => $giftCode]);
   }
 
   /**

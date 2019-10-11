@@ -10,9 +10,8 @@
 
 namespace wagood\membershipasgift;
 
-use wagood\membershipasgift\services\GiftService;
 use wagood\membershipasgift\variables\MembershipasgiftVariable;
-use wagood\membershipasgift\fields\GiftField;
+use wagood\membershipasgift\traits\PluginTrait;
 
 use Craft;
 use craft\base\Plugin;
@@ -65,6 +64,11 @@ class MembershipAsGift extends Plugin
    */
   public $schemaVersion = '0.0.1';
 
+  // Traits
+  // =========================================================================
+
+  use PluginTrait;
+
   // Public Methods
   // =========================================================================
 
@@ -84,6 +88,7 @@ class MembershipAsGift extends Plugin
     parent::init();
     self::$plugin = $this;
 
+    $this->_setPluginComponents();
     $this->_registerSiteRoutes();
 
     // Register our site routes
@@ -172,7 +177,7 @@ class MembershipAsGift extends Plugin
     Event::on(UrlManager::class, UrlManager::EVENT_REGISTER_SITE_URL_RULES, function(RegisterUrlRulesEvent $event) {
       $event->rules = array_merge($event->rules, [
           'members/activation/<giftId:\w+>' => 'membership-as-gift/gift/activate',
-          'members/voucher/create/<userId:\d+>' => 'membership-as-gift/gift/create',
+          'members/voucher/create/<Id:\d+>' => 'membership-as-gift/gift/create',
         /**'gift-voucher/voucher-types/<voucherTypeId:\d+>' => 'gift-voucher/voucher-types/edit',
 
         'gift-voucher/vouchers/<voucherTypeHandle:{handle}>' => 'gift-voucher/vouchers/index',
